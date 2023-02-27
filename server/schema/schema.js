@@ -8,7 +8,8 @@ const {GraphQLObjectType,
     GraphQLList,
     GraphQLNonNull,
     GraphQLEnumType
-} = require ('graphql')
+} = require ('graphql');
+const { where } = require('sequelize');
 
 const ClientType = new GraphQLObjectType({
     name: 'Client',
@@ -99,6 +100,14 @@ const mutation = new GraphQLObjectType({
                 id:{type: GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
+                Project.findAll({where:{clientID: args.id}}).then(
+                    (projects) => {
+                        projects.forEach(project =>{
+                            project.destroy()
+                        })
+                    }
+                )
+
                 return Client.destroy({where: {id: args.id}})
             }
         },
